@@ -115,7 +115,7 @@ class MediaService():
                     media_type_files = glob.glob(f'{media_folder}/*.{file_extension}')
                     media_files.extend(media_type_files)
                 media_files = _get_sorted(media_files)
-                media_files = [url.replace(f'{media_folder}\\','') for url in media_files]
+                media_files = [url.replace(f'{media_folder}\\','').replace(f'{media_folder}/','') for url in media_files]
             elif media_source.get('media_links', None):
                 media_files = media_source['media_links']
 
