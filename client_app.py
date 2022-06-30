@@ -117,7 +117,7 @@ def get_media_b64(source, media):
     return media_b64
 
 def get_media_full_path(source, media):
-    media_path = MS.media_full_path(source=source, media_file=media)
+    media_path = MS.media_full_path(source=source, media_file=media)['media_full_path']
     return media_path
 
 # --------------------------------------------------------------------------------
@@ -223,7 +223,6 @@ def main():
             else:
                 state.NUM_COLS = st.number_input('Number columns', 1, 80, int(state.NUM_COLS), 1)
                 state.IMG_W = st.number_input('Image width', 32, 3200, int(state.IMG_W), 32)
-
 
         with st.expander('🌀 Recycle media service'):
             st.caption('Use this to reload external media config (toml) file changes')

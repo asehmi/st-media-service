@@ -6,7 +6,7 @@
         url: "https://www.linkedin.com/in/asehmi/"
         mail: "vin [at] thesehmis.com"
         avatar: "https://twitter.com/asehmi/profile_image?size=original"
-    related: https://github.com/asehmi/st-media-server) is a similar FastAPI (client-server) version of this application
+    related: https://github.com/asehmi/st-media-server is a similar FastAPI (client-server) version of this application
 
 ## Overview
 

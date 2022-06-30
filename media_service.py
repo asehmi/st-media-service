@@ -56,7 +56,7 @@ class MediaService():
         if not os.path.isfile(filename):
             raise FileNotFoundError({'msg': filename, 'status_code': 404})
 
-        return filename
+        return {'media_full_path': filename}
 
     def media(self, source: str, media_file: str, encode: bool = False):
         media_source = self.MEDIA_SOURCES[source]
