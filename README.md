@@ -16,7 +16,7 @@ This Streamlit app renders an image grid and provides some controls to sort and 
 
 ### Try the demo app yourself
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](#)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://asehmi-st-media-service-client-app-01b2hx.streamlitapp.com/)
 
 ## Installation
 
