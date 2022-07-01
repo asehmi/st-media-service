@@ -1,10 +1,10 @@
 media_service.toml
-Procfile
-setup.sh
+# Procfile
+# setup.sh
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
-# .vscode/
+.vscode/
 *.py[cod]
 *$py.class
 *.pkl
