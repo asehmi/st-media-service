@@ -8,7 +8,7 @@ class MediaService():
 
     def __init__(self):
         """
-        Initializes a custom FastAPI instance to serve media (image) files.
+        Initializes instance to serve media (image) files.
         """
         print('Initializing MediaService...')
         
