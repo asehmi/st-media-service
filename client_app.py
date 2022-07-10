@@ -160,9 +160,10 @@ def get_media_full_path(source, media):
 def _recycle_media_service_cb():
     state.MEDIA_SERVICE = MediaService()
     state.MEDIA_SOURCE = None
-    state.NUM_IMAGES = int(st.secrets['DEFAULT_NUM_IMAGES'])
-    state.SHOW_CAPTIONS = False
     state.MEDIA_FILTER = None
+    state.NUM_IMAGES = int(st.secrets['DEFAULT_NUM_IMAGES'])
+    state.USE_PRESET = True
+    state.SHOW_CAPTIONS = False
     state.MEDIA_LIST_SORT = True
     state.MEDIA_LIST_DATE_SORT = True
     state.MEDIA_LIST_SORT_ASC = False
@@ -171,9 +172,10 @@ def _recycle_media_service_cb():
 
 def _set_media_source_cb():
     state.MEDIA_SOURCE = state['media_source']
-    state.NUM_IMAGES = state['num_images']
-    state.SHOW_CAPTIONS = state['show_captions']
     state.MEDIA_FILTER = None
+    state.NUM_IMAGES = state['num_images']
+    state.USE_PRESET = True
+    state.SHOW_CAPTIONS = False
     state.MEDIA_LIST_SORT = True
     state.MEDIA_LIST_DATE_SORT = True
     state.MEDIA_LIST_SORT_ASC = False
@@ -188,6 +190,11 @@ def _set_media_source_cb():
 def _set_media_controls_cb():
     state.MEDIA_SOURCE = state['media_source']
     state.MEDIA_FILTER = state['media_filter']
+    state.NUM_IMAGES = state['num_images']
+    state.USE_PRESET = state['use_preset']
+    state.SHOW_CAPTIONS = state['show_captions']
+    state.NUM_COLS = state['num_cols']
+    state.IMG_W = state['img_w']
     state.MEDIA_LIST_SORT = state['media_list_sort']
     state.MEDIA_LIST_DATE_SORT = state['media_list_date_sort']
     state.MEDIA_LIST_SORT_ASC = state['media_list_sort_asc']
@@ -202,6 +209,15 @@ def _set_media_controls_cb():
 # Prevents double clicking to make widget state stick
 def _set_use_preset_cb():
     state.USE_PRESET = state['use_preset']
+
+def _set_captions_cb():
+    state.SHOW_CAPTIONS = state['show_captions']
+
+def _set_num_cols_cb():
+    state.NUM_COLS = state['num_cols']
+
+def _set_img_w_cb():
+    state.IMG_W = state['img_w']
 
 def _set_screen_width_default_index_cb():
     state.SCREEN_WIDTH_DEFAULT = state['screen_width_choice']
@@ -236,15 +252,14 @@ def main():
                 key='media_source'
             )
             state.NUM_IMAGES = st.number_input(
-                'Max images', 10, int(st.secrets['MAX_NUM_IMAGES']), int(state.NUM_IMAGES), 
-                100, key='num_images')
-            state.SHOW_CAPTIONS = st.checkbox('Captions', state.SHOW_CAPTIONS, key='show_captions')
+                'Max images', 0, int(st.secrets['MAX_NUM_IMAGES']), int(state.NUM_IMAGES), 
+                100, key='num_images', help='A value of zero will not impose a limit on the number of images pulled')
             if st.form_submit_button('Apply', on_click=_set_media_source_cb):
                 st.experimental_rerun()
 
-        with st.expander('📅 Sort settings', expanded=False):
+        with st.expander('📅 Media settings', expanded=False):
             with st.form(key='media_controls_form', clear_on_submit=False):
-                state.MEDIA_FILTER = st.text_input('🔎 Filter keyword', state.MEDIA_FILTER, key='media_filter')
+                state.MEDIA_FILTER = st.text_input('🔎 Filter keyword', state.MEDIA_FILTER, key='media_filter', help='Keyword will be used to match filenames')
                 c1, c2 = st.columns(2)
                 state.MEDIA_LIST_SORT = c1.checkbox('Sort', state.MEDIA_LIST_SORT, key='media_list_sort')
                 state.MEDIA_LIST_SORT_ASC = c2.checkbox('Ascending', state.MEDIA_LIST_SORT_ASC, disabled=(not state.MEDIA_LIST_SORT), key='media_list_sort_asc')
@@ -254,7 +269,8 @@ def main():
                     st.experimental_rerun()
 
         with st.expander('👀 Layout settings', expanded=True):
-            state.USE_PRESET = st.checkbox('Show presets', state.USE_PRESET, on_change=_set_use_preset_cb, key='use_preset')
+            state.SHOW_CAPTIONS = st.checkbox('Show captions', state.SHOW_CAPTIONS, on_change=_set_captions_cb, key='show_captions')
+            state.USE_PRESET = st.checkbox('Use presets', state.USE_PRESET, on_change=_set_use_preset_cb, key='use_preset')
             if state.USE_PRESET:
                 st.selectbox(
                     'What is your screen width?', options=state.SCREEN_WIDTH_OPTIONS,
@@ -272,9 +288,15 @@ def main():
                 )
                 state.NUM_COLS = int(preset_choice.split(',')[0].strip())
                 state.IMG_W = int(preset_choice.split(',')[1].strip())
+                st.markdown('---')
+                # Must ensure these keyed widgets are created in both branches as other callbacks use their so they need to exist 
+                state.NUM_COLS = st.number_input('Number columns', 1, 80, int(state.NUM_COLS), 1, on_change=_set_num_cols_cb, key='num_cols',
+                    disabled=True, help='To make manual adjustments, uncheck presets')
+                state.IMG_W = st.number_input('Image width', 32, 3200, int(state.IMG_W), 32, on_change=_set_img_w_cb, key='img_w',
+                    disabled=True, help='To make manual adjustments, uncheck presets')
             else:
-                state.NUM_COLS = st.number_input('Number columns', 1, 80, int(state.NUM_COLS), 1)
-                state.IMG_W = st.number_input('Image width', 32, 3200, int(state.IMG_W), 32)
+                state.NUM_COLS = st.number_input('Number columns', 1, 80, int(state.NUM_COLS), 1, on_change=_set_num_cols_cb, key='num_cols')
+                state.IMG_W = st.number_input('Image width', 32, 3200, int(state.IMG_W), 32, on_change=_set_img_w_cb, key='img_w')
 
         with st.expander('🌀 Recycle media service'):
             st.caption('Use this to reload external media config (toml) file changes')
@@ -290,7 +312,8 @@ def main():
         sort_by_date_flag=state.MEDIA_LIST_DATE_SORT,
         ascending=state.MEDIA_LIST_SORT_ASC
     )
-    images = {media: media for media in media_list[:int(state.NUM_IMAGES)]}
+    working_media_list = media_list[:int(state.NUM_IMAGES)] if int(state.NUM_IMAGES) > 0 else media_list
+    images = {media: media for media in working_media_list}
 
     cols = cycle(st.columns(int(state.NUM_COLS)))
     for img, caption in images.items():
